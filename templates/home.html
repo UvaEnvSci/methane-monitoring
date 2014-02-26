@@ -1,0 +1,110 @@
+﻿<HTML>
+
+<HEAD>
+   <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+   <script src="http://code.highcharts.com/highcharts.js"></script>
+   <script src="http://code.highcharts.com/modules/exporting.js"></script>
+   
+   <script>$(function () {
+        $('#container1').highcharts({
+            title: {
+                text: 'Temperature',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: WorldClimate.com',
+                x: -20
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                    text: 'Temperature (°C)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: '°C'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'London',
+                data: [
+				{% for result in results %}
+				{{ result.temperature }},
+                {% endfor %}
+				
+				]
+            }]
+        });
+    });
+    
+</script>
+   <script>$(function () {
+        $('#container2').highcharts({
+            title: {
+                text: 'Relative Humidity',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: WorldClimate.com',
+                x: -20
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%e. %b',
+                    year: '%b'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Relative Humidity (%)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: '°C'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'London',
+                data: [
+				{% for result in results %}
+				{{ [Date.UTC(2014,  2, 12), result.relativehumidity] }},
+                {% endfor %}
+				
+				]
+            }]
+        });
+    });
+    
+</script>
+</HEAD>
+
+<BODY>
+   <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+   <div id="container2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+ </BODY>
+
+</HTML>
