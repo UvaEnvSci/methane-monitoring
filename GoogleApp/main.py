@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 class Data(ndb.Model):
    datastringtime = ndb.DateTimeProperty(auto_now_add=True)
+   ID = ndb.StringProperty()
    temperature = ndb.FloatProperty()
    relativehumidity = ndb.FloatProperty()
    gassensor = ndb.FloatProperty()
@@ -25,12 +26,13 @@ def home():
 @app.route('/log')
 
 def log():
+   datastringID = request.args.get('ID','NA')
    datastringtemp = request.args.get('T','9999')
    datastringhum = request.args.get('rH','9999')
    datastringgassensor = request.args.get('CH4','9999')
    datastringpressure = request.args.get('P','9999')
    datastringbattery = request.args.get('Batt','9999')
-   data = Data(temperature = float(datastringtemp)/100.0, relativehumidity = float(datastringhum)/100.0, gassensor = float(datastringgassensor), pressure = float(datastringpressure), battery = float(datastringbattery)/100.0)
+   data = Data(ID = datastringID, temperature = float(datastringtemp)/100.0, relativehumidity = float(datastringhum)/100.0, gassensor = float(datastringgassensor), pressure = float(datastringpressure), battery = float(datastringbattery)/100.0)
    data.put()
    return '0'
 
