@@ -248,7 +248,7 @@ void loop()
   pinMode(XBee,OUTPUT);
   digitalWrite(XBee,LOW); // wake up Xbee
   delay(50);              // allow connect XBee to network.
-  snprintf ( message, 92, "localhost:8080/log?ID=%d&T=%d&rH=%d&CH4=%d&P=%d&Batt=%d", ID, measTInt, measrHInt, gasVal, PInt, voltageInt);
+  snprintf ( message, 92, "http://172.25.106.38:8080/log?ID=%d&T=%d&rH=%d&CH4=%d&P=%d&Batt=%d", ID, measTInt, measrHInt, gasVal, PInt, voltageInt);
   Serial.println(message);
   pinMode(XBee,INPUT);
   digitalWrite(XBee,HIGH);
@@ -266,8 +266,8 @@ void loop()
   sleep_bod_disable(); // Disable brown out detection during sleep. Saves more power
   sei();
        
-  Serial.print("\nSleeping");
-  Serial.println();
+//  Serial.print("\nSleeping");
+//  Serial.println();
   delay(20); //This delay is required to allow print to complete
   //Shut down all peripherals like ADC before sleep. Refer Atmega328 manual
   power_all_disable(); //This shuts down ADC, TWI, SPI, Timers and USART
@@ -275,8 +275,8 @@ void loop()
   sleep_disable();     // Wakes up sleep and clears enable bit. Before this ISR would have executed
   power_all_enable();  //This shuts enables ADC, TWI, SPI, Timers and USART
   delay(10); //This delay is required to allow CPU to stabilize
-  Serial.print("Awake from sleep");
-  Serial.println();  
+//  Serial.print("Awake from sleep");
+//  Serial.println();  
     
   //\/\/\/\/\/\/\/\/\/\/\/\/Sleep Mode and Power Saver routines\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
