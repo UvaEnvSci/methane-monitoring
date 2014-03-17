@@ -1,0 +1,8 @@
+﻿The files contained here are part of a project on measuring the concentration of atmospheric methane near hydrofracturing sites using low-cost sensors.
+* Sensor data will be acquired using a Seeeduino Stalker v2.3 board and the Arduino IDE. The directory 'Arduino' contains the sketches made in the IDE.
+* Sensor data will be distributed in real-time to the internet, to a google application written in Python. The directory 'GoogleApp' contains the main.py file
+for the Google Application that logs and stores the sensor data and the home.html file for the website that shows the sensor data.
+
+Author: Michael van den Bossche
+Contact: mv7b@virginia.edu
+
