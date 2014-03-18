@@ -1,0 +1,148 @@
+﻿<HTML>
+
+<HEAD>
+   <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+   <script src="http://code.highcharts.com/highcharts.js"></script>
+   <script src="http://code.highcharts.com/modules/exporting.js"></script>
+   
+   <script>$(function () {
+        $('#container1').highcharts({
+            title: {
+                text: 'Temperature',
+                x: -20 //center
+            },
+            xAxis: {
+                
+            },
+            yAxis: {
+                title: {
+                    text: 'Temperature (°C)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: '°C'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'sensor1',
+                data: [
+				{% for result1 in results1 %}
+				{{ result1.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor2',
+                data: [
+				{% for result2 in results2 %}
+				{{ result2.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor3',
+                data: [
+				{% for result3 in results3 %}
+				{{ result3.temperature }},
+                {% endfor %}
+				
+				]
+            }]
+        });
+    });
+    
+</script>
+   <script>$(function () {
+        var options = {
+
+                            chart: {renderTo: 'container'},
+
+                            title: {text: 'Temp'},
+
+                            subtitle: {text: ' '},
+
+                            xAxis: {text: 'Time',type: 'datetime'},
+
+                            yAxis: [{ // left y axis
+
+                                        title: {text: 'Temperature (C)'},
+
+                                        labels: {align: 'left', x: 3, y: 16,
+
+                                                formatter: function() {
+
+                                        return
+Highcharts.numberFormat(this.value, 0);}
+
+                                    },
+
+                                    showFirstLabel: false},
+
+                                    { // right y axis
+
+                                        linkedTo: 0, gridLineWidth: 0,
+opposite: true,
+
+                                        title: {text: 'Temperature (℉)'},
+
+                                                labels: {align:
+'right', x: -3, y: 16,
+
+                                                    formatter: function() {
+
+                                        return
+Highcharts.numberFormat(this.value, 0);}
+
+                                    },
+
+                                    showFirstLabel: false
+
+                            }],
+
+                            series: [   {name: 'Air Temp'}
+
+                                    ]
+
+            };
+
+    var chart = new Highcharts.Chart(options);
+
+	var lasttimestamp;
+	
+	var getdata = function(query){
+		var url;
+		if (query) url="api?time="+query;
+		else url="api";
+		$.getJSON( url, function ( data ) {
+			$.each( data, function( index, value ) {
+			    lasttimestamp = value.datastringtime;
+				chart.series[0].addPoint([value.datastringtime, value.temperature]);
+		    });
+		});
+	}
+	getdata();
+	
+  setInterval(function(){
+  getdata(lasttimestamp);
+ },10000);
+    });
+    
+
+    
+</script>
+</HEAD>
+
+<BODY>
+   <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+   <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+ </BODY>
+
+</HTML>
