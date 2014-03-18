@@ -6,63 +6,15 @@
    <script src="http://code.highcharts.com/modules/exporting.js"></script>
    
    <script>$(function () {
-        $('#container1').highcharts({
-            title: {
-                text: 'Temperature',
-                x: -20 //center
-            },
-            xAxis: {
-                
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature (°C)'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                valueSuffix: '°C'
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                borderWidth: 0
-            },
-            series: [{
-                name: 'sensor1',
-                data: [
-				{% for result1 in results1 %}
-				{{ result1.temperature }},
-                {% endfor %}
-				
-				]},{
-				name: 'sensor2',
-                data: [
-				{% for result2 in results2 %}
-				{{ result2.temperature }},
-                {% endfor %}
-				
-				]
-            }]
-        });
-    });
-    
-</script>
-   <script>$(function () {
         var options = {
 
                             chart: {renderTo: 'container'},
 
-                            title: {text: 'Temp'},
+                            title: {text: 'Temperature'},
 
                             subtitle: {text: ' '},
 
-                            xAxis: {text: 'Time',type: 'datetime'},
+                            xAxis: {text: 'Time (UTC)',type: 'datetime'},
 
                             yAxis: [{ // left y axis
 
@@ -117,7 +69,7 @@ Highcharts.numberFormat(this.value, 0);}
 		$.getJSON( url, function ( data ) {
 			$.each( data, function( index, value ) {
 			    lasttimestamp = value.datastringtime;
-				chart.series[0].addPoint([value.datastringtime, value.temperature]);
+				chart.series[0].addPoint([value.datastringtime*1000, value.temperature]);
 		    });
 		});
 	}
@@ -134,7 +86,6 @@ Highcharts.numberFormat(this.value, 0);}
 </HEAD>
 
 <BODY>
-   <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
    <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
  </BODY>
 
