@@ -60,7 +60,7 @@ def api():
    if prevrequestdatetime is None:
       query = Data.query().order(Data.datastringtime)
    else:
-      dt = datetime.datetime.fromtimestamp(float(prevrequestdatetime))
+      dt = datetime.datetime.fromtimestamp(float(prevrequestdatetime)).isoformat()
       query = Data.query(Data.datastringtime > dt).order(Data.datastringtime)
    js = json.dumps([p.to_dict() for p in query.fetch()], default=handler)
    resp = Response(js, status=200, mimetype='application/json')
