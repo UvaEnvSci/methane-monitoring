@@ -7,14 +7,12 @@
    
    <script>$(function () {
         var options = {
-
                             chart: {renderTo: 'container'},
-
                             title: {text: 'Temperature'},
-
                             subtitle: {text: ' '},
-
-                            xAxis: {text: 'Time (UTC)',type: 'datetime'},
+                            xAxis: {
+								title: {text: 'Time (UTC)'},
+								type: 'datetime'},
 
                             yAxis: [{ // left y axis
 
@@ -36,7 +34,7 @@ Highcharts.numberFormat(this.value, 0);}
                                         linkedTo: 0, gridLineWidth: 0,
 opposite: true,
 
-                                        title: {text: 'Temperature (℉)'},
+                                        title: {text: 'Temperature (C)'},
 
                                                 labels: {align:
 'right', x: -3, y: 16,
@@ -52,7 +50,9 @@ Highcharts.numberFormat(this.value, 0);}
 
                             }],
 
-                            series: [   {name: 'Air Temp'}
+                            series: [   {name: 'Sensor#1'},
+							            {name: 'Sensor#2'},
+										{name: 'Sensor#3'}
 
                                     ]
 
@@ -69,7 +69,14 @@ Highcharts.numberFormat(this.value, 0);}
 		$.getJSON( url, function ( data ) {
 			$.each( data, function( index, value ) {
 			    lasttimestamp = value.datastringtime;
-				chart.series[0].addPoint([value.datastringtime*1000, value.temperature]);
+				for (var n=1;n<4;n++)
+				{
+				    if (value.ID == n)
+					{
+						var m = n - 1
+				        chart.series[m].addPoint([value.datastringtime*1000, value.temperature]);
+					}	
+				}
 		    });
 		});
 	}
