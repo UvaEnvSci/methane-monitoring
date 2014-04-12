@@ -54,6 +54,62 @@
 				{{ result3.temperature }},
                 {% endfor %}
 				
+				]},{
+				name: 'sensor4',
+                data: [
+				{% for result4 in results4 %}
+				{{ result4.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor5',
+                data: [
+				{% for result5 in results5 %}
+				{{ result5.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor6',
+                data: [
+				{% for result6 in results6 %}
+				{{ result6.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor7',
+                data: [
+				{% for result7 in results7 %}
+				{{ result7.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor8',
+                data: [
+				{% for result8 in results8 %}
+				{{ result8.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor9',
+                data: [
+				{% for result9 in results9 %}
+				{{ result9.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor10',
+                data: [
+				{% for result10 in results10 %}
+				{{ result10.temperature }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor11',
+                data: [
+				{% for result11 in results11 %}
+				{{ result11.temperature }},
+                {% endfor %}
+				
 				]
             }]
         });
@@ -109,6 +165,172 @@
 				{{ result3.relativehumidity }},
                 {% endfor %}
 				
+				]},{
+				name: 'sensor4',
+                data: [
+				{% for result4 in results4 %}
+				{{ result4.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor5',
+                data: [
+				{% for result5 in results5 %}
+				{{ result5.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor6',
+                data: [
+				{% for result6 in results6 %}
+				{{ result6.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor7',
+                data: [
+				{% for result7 in results7 %}
+				{{ result7.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor8',
+                data: [
+				{% for result8 in results8 %}
+				{{ result8.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor9',
+                data: [
+				{% for result9 in results9 %}
+				{{ result9.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor10',
+                data: [
+				{% for result10 in results10 %}
+				{{ result10.relativehumidity }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor11',
+                data: [
+				{% for result11 in results11 %}
+				{{ result11.relativehumidity }},
+                {% endfor %}
+				
+				]
+            }]
+        });
+    });
+</script>
+<script>$(function () {
+        $('#container3').highcharts({
+            title: {
+                text: 'gas sensor',
+                x: -20 //center
+            },
+            xAxis: {
+                
+            },
+            yAxis: {
+                title: {
+                    text: 'gas sensor'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: '-'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'sensor1',
+                data: [
+				{% for result1 in results1 %}
+				{{ result1.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor2',
+                data: [
+				{% for result2 in results2 %}
+				{{ result2.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor3',
+                data: [
+				{% for result3 in results3 %}
+				{{ result3.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor4',
+                data: [
+				{% for result4 in results4 %}
+				{{ result4.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor5',
+                data: [
+				{% for result5 in results5 %}
+				{{ result5.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor6',
+                data: [
+				{% for result6 in results6 %}
+				{{ result6.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor7',
+                data: [
+				{% for result7 in results7 %}
+				{{ result7.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor8',
+                data: [
+				{% for result8 in results8 %}
+				{{ result8.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor9',
+                data: [
+				{% for result9 in results9 %}
+				{{ result9.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor10',
+                data: [
+				{% for result10 in results10 %}
+				{{ result10.gassensor }},
+                {% endfor %}
+				
+				]},{
+				name: 'sensor11',
+                data: [
+				{% for result11 in results11 %}
+				{{ result11.gassensor }},
+                {% endfor %}
+				
 				]
             }]
         });
@@ -120,6 +342,7 @@
 <BODY>
    <div id="container1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
    <div id="container2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+   <div id="container3" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
  </BODY>
 
 </HTML>

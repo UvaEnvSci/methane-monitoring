@@ -30,7 +30,15 @@ def home():
    query1 = Data.query(Data.ID == '1').order(Data.datastringtime)
    query2 = Data.query(Data.ID == '2').order(Data.datastringtime)
    query3 = Data.query(Data.ID == '3').order(Data.datastringtime)
-   return render_template('home.html',results1=query1,results2=query2,results3=query3)
+   query4 = Data.query(Data.ID == '4').order(Data.datastringtime)
+   query5 = Data.query(Data.ID == '5').order(Data.datastringtime)
+   query6 = Data.query(Data.ID == '6').order(Data.datastringtime)
+   query7 = Data.query(Data.ID == '7').order(Data.datastringtime)
+   query8 = Data.query(Data.ID == '8').order(Data.datastringtime)
+   query9 = Data.query(Data.ID == '9').order(Data.datastringtime)
+   query10 = Data.query(Data.ID == '10').order(Data.datastringtime)
+   query11 = Data.query(Data.ID == '11').order(Data.datastringtime)
+   return render_template('home.html',results1=query1,results2=query2,results3=query3,results4=query4,results5=query5,results6=query6,results7=query7,results8=query8,results9=query9,results10=query10,results11=query11)
    
 @app.route('/log')
 
