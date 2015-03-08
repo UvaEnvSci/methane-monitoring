@@ -1,7 +1,7 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 6.0
+Version : 7.0 - Switch between AREFs for battery and for gas sensor.
 Date    : 2014-02-18
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
@@ -14,7 +14,7 @@ Based on the following example sketches:
   'SFE_BMP180_Example',
   battery 'example' and 'tropo'.
 
-Last updated 2014.02.17
+Last updated 2014.02.18
 */
 
 //include libraries
@@ -107,8 +107,6 @@ void error_P(const char* str) {
 
 void setup()
 {
-  analogReference(EXTERNAL); // use AREF for reference voltage (3.3)
-
   /*Initialize INT0 pin for accepting interrupts */
   //From StalkerV21_DataLogger_5min example
   PORTD |= 0x04; 
@@ -127,6 +125,8 @@ void setup()
   //Enable Interrupt 
   DateTime  start = RTC.now();
   interruptTime = DateTime(start.get() + tcycle); //Adds SleepInt (in sec) to start time
+
+  pinMode(heaterPin1, OUTPUT); // set digital pin 8 as output to the 5V board
 
   // from SFE_BMP180_example
   // Initialize the pressure sensor
@@ -168,8 +168,13 @@ void setup()
 
 void loop()
 {
-  digitalWrite(heaterPin1, HIGH); // turn 5V board on;
-  delay(175000);
+  gasVal1 = analogRead(gasPin1);  // read out gasVal to prevent wrong readings - 'warm-up' analog port.  
+  digitalWrite(heaterPin1, HIGH); // turn heater on;
+  pinMode(AREFControl, OUTPUT);
+  digitalWrite(AREFControl, HIGH);
+  delay(2000);
+  analogReference(EXTERNAL); // use AREF for reference voltage (3.3)
+  delay(173000);
 
   // from Stalkerv21_DataLogger_5min example
   // initialize the SD card
@@ -279,8 +284,30 @@ void loop()
     file.print(",");
   }
 
-  digitalWrite(heaterPin1, LOW); //shut off 5V board to save power
- 
+  digitalWrite(heaterPin1, LOW); //shut off heater to save power
+  // From battery example sketch
+  analogReference(INTERNAL);
+  pinMode(AREFControl, INPUT);
+  delay(5000);
+  battery.update();
+  float voltage = battery.getVoltage();
+  int percentage = battery.getPercentage();
+  char* CS = battery.getChStatus();
+  delay(2000);
+  battery.update();
+  voltage = battery.getVoltage();
+  percentage = battery.getPercentage();
+  CS = battery.getChStatus();
+      
+  Serial.print("battery: ");
+  Serial.print(voltage);
+  Serial.print("V  -> ");
+  Serial.print(percentage);
+  Serial.print("%     Charge Status: ");
+  Serial.println(CS);
+  Serial.println();
+  delay(10);
+   
   //from SFE_BMP180_example
   char status;
   double T,P,p0,a;
@@ -322,21 +349,6 @@ void loop()
   }
   else Serial.println("error starting temperature measurement\n");
 
-  // From battery example sketch
-  battery.update();
-  float voltage = battery.getVoltage();
-  int percentage = battery.getPercentage();
-  char* CS = battery.getChStatus();
-      
-  Serial.print("battery: ");
-  Serial.print(voltage);
-  Serial.print("V  -> ");
-  Serial.print(percentage);
-  Serial.print("%     Charge Status: ");
-  Serial.println(CS);
-  Serial.println();
-  delay(10);
-  
   // logging battery status
   file.print(voltage);
   file.print(',');
