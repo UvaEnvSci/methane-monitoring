@@ -1,8 +1,8 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 2.0
-Date    : 2014-02-03
+Version : 3.0
+Date    : 2014-02-04
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
 Reports battery status.
@@ -14,7 +14,7 @@ Based on the following example sketches:
   'SFE_BMP180_Example',
   battery 'example' and 'tropo'.
 
-Last updated 2014.01.31
+Last updated 2014.02.04
 */
 
 //include libraries
@@ -33,10 +33,11 @@ Last updated 2014.01.31
 // int tSHT = 5000;      // time between SHT measurements (5 seconds)
 // int tSHTMeas = 400;   // time it takes to do one SHT measurement (400ms)
 int tcycle = 600;        // time for one meas cycle (in s, 10 minutes). tcycle > theat + tmeas
-
+int i = 5;               // nr of gas sensor measurements per cycle.
+int j = 0;               // counter
 
 // filename
-char name[] = "TESTMB77.CSV";
+char name[] = "TESTMB80.CSV";
 
 // define digital pins for SHT sensor
 const uint8_t dataPinSHT15  =  7;
@@ -106,6 +107,8 @@ void error_P(const char* str) {
 
 void setup()
 {
+  analogReference(EXTERNAL); // use AREF for reference voltage (3.3)
+
   /*Initialize INT0 pin for accepting interrupts */
   //From StalkerV21_DataLogger_5min example
   PORTD |= 0x04; 
@@ -141,7 +144,6 @@ void setup()
   else
   {
     Serial.println("BMP180 init fail\n\n");
-    while(1); // Pause forever.
   }
   
   // from Stalkerv21_DataLogger_5min example
@@ -161,11 +163,11 @@ void setup()
       error("error opening file");
   
   // logging header
-  file.println("date,time,julian,batt voltage [V],charge [%],status,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [mV],pAbs [mb],pSea [mb]");
+  file.print("date,time,julian,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [mV],batt voltage [V],charge [%],status,pAbs [mb],pSea [mb]");
 
-    if (!file.close()) 
+  if (!file.close()) 
       error("error closing file");
-  }
+}
 
 void loop()
 {
@@ -173,69 +175,116 @@ void loop()
   Serial.println("Heater On");
   Serial.println();
   delay(175000);
+
+  // from Stalkerv21_DataLogger_5min example
+  // initialize the SD card
+  if (!card.init()) error("card.init");
+   
+  // initialize a FAT16 volume
+  if (!Fat16::init(&card)) error("Fat16::init");
+  
+  // clear write error
+  file.writeError = false;
+  
+  // O_CREAT - create the file if it does not exist
+  // O_APPEND - seek to the end of the file prior to each write
+  // O_WRITE - open for write
+  if (!file.open(name, O_CREAT | O_APPEND | O_WRITE))
+      error("error opening file");
     
-  //SHT sensor readout 1
-  SHT15.measure(&tempSHT1, &humSHT1, &dewSHT1);
+  for (j=0;j<i;j++)
+  {  
+    //SHT sensor readout 1
+    SHT15.measure(&tempSHT1, &humSHT1, &dewSHT1);
+  
+    Serial.print("SHT15  Temp: ");
+    Serial.print(tempSHT1);
+    Serial.print(" C, rH: ");
+    Serial.print(humSHT1);
+    Serial.println(" %");
+  
+    delay(4600);
+  
+    DateTime now = RTC.now(); //get the current date-time
+    Serial.print(now.year(), DEC);
+    Serial.print('-');
+    Serial.print(now.month(), DEC);
+    Serial.print('-');
+    Serial.print(now.date(), DEC);
+    Serial.print(' ');
+    Serial.print(now.hour(), DEC);
+    Serial.print(':');
+    Serial.print(now.minute(), DEC);
+    Serial.print(':');
+    Serial.print(now.second(), DEC);
+    Serial.print(' ');
+    Serial.println();
+  
+    //SHT sensor readout 2
+    SHT15.measure(&tempSHT2, &humSHT2, &dewSHT2);
      
-  Serial.print("SHT15  Temp: ");
-  Serial.print(tempSHT1);
-  Serial.print(" C, RH: ");
-  Serial.print(humSHT1);
-  Serial.println(" %");
-  Serial.println();
+    Serial.print("SHT15  Temp: ");
+    Serial.print(tempSHT2);
+    Serial.print(" C, rH: ");
+    Serial.print(humSHT2);
+    Serial.println(" %");
   
-  delay(4600);
+    // gas sensor measurement
+    gasVal1 = analogRead(gasPin1);       // read the analog in value
+    Serial.print("gas sensor reading: ");
+    Serial.println(gasVal1);
   
-  DateTime now = RTC.now(); //get the current date-time
+    delay(4600);
   
-  Serial.print(now.year(), DEC);
-  Serial.print('-');
-  Serial.print(now.month(), DEC);
-  Serial.print('-');
-  Serial.print(now.date(), DEC);
-  Serial.print(' ');
-  Serial.print(now.hour(), DEC);
-  Serial.print(':');
-  Serial.print(now.minute(), DEC);
-  Serial.print(':');
-  Serial.print(now.second(), DEC);
-  Serial.print(' ');
-  Serial.println();
-  Serial.print("Seconds since 1/1/2000: "); 
-  Serial.print(now.get(),DEC);
-  Serial.println();
-  
-  //SHT sensor readout 2
-  SHT15.measure(&tempSHT2, &humSHT2, &dewSHT2);
+    //SHT sensor readout
+    SHT15.measure(&tempSHT3, &humSHT3, &dewSHT3);
      
-  Serial.print("SHT15  Temp: ");
-  Serial.print(tempSHT2);
-  Serial.print(" C, RH: ");
-  Serial.print(humSHT2);
-  Serial.println(" %");
-  Serial.println();
+    Serial.print("SHT15  Temp: ");
+    Serial.print(tempSHT3);
+    Serial.print(" C, rH: ");
+    Serial.print(humSHT3);
+    Serial.println(" %");
+    Serial.println();
+    delay(20400);
+
+    // logging timestamp
+    // from 'now' example sketch
+    file.println();
+    file.print(now.year(), DEC);
+    file.print('-');
+    file.print(now.month(), DEC);
+    file.print('-');
+    file.print(now.date(), DEC);
+    file.print(',');
+    file.print(now.hour(), DEC);
+    file.print(':');
+    file.print(now.minute(), DEC);
+    file.print(':');
+    file.print(now.second(), DEC);
+    file.print(',');
+    file.print(now.get(),DEC);
+    file.print(',');
   
-  // gas sensor measurement
-  gasVal1 = analogRead(gasPin1);       // read the analog in value
+    // logging SHT sensor info
+    file.print(tempSHT1);
+    file.print(",");
+    file.print(humSHT1);
+    file.print(",");
+    file.print(tempSHT2);
+    file.print(",");
+    file.print(humSHT2);
+    file.print(",");
+    file.print(tempSHT3);
+    file.print(",");
+    file.print(humSHT3);
+    file.print(",");
+
+    // logging gas sensor info
+    file.print(gasVal1);
+    file.print(",");
+  }
   digitalWrite(heaterPin1, LOW);       // shut off the heater  
-  
-  Serial.print("gas sensor reading: ");
-  Serial.println(gasVal1);
-  Serial.println();
-  
-  delay(4600);
-  
-  //SHT sensor readout
-  SHT15.measure(&tempSHT3, &humSHT3, &dewSHT3);
-     
-  Serial.print("SHT15  Temp: ");
-  Serial.print(tempSHT3);
-  Serial.print(" C, RH: ");
-  Serial.print(humSHT3);
-  Serial.println(" %");
-  Serial.println();
-  delay(10);
-  
+  	
   //from SFE_BMP180_example
   char status;
   double T,P,p0,a;
@@ -251,7 +300,7 @@ void loop()
       // Print out the measurement:
       Serial.print("temperature: ");
       Serial.print(T,2);
-      Serial.print(" deg C, ");
+      Serial.print(" C, ");
       Serial.println();
             
       status = pressure.startPressure(3);  // Start a pressure measurement
@@ -268,7 +317,6 @@ void loop()
           Serial.print("relative (sea-level) pressure: ");
           Serial.print(p0,2);
           Serial.println(" mb, ");
-          Serial.println();
         }
         else Serial.println("error retrieving pressure measurement\n");
       }
@@ -293,40 +341,6 @@ void loop()
   Serial.println();
   delay(10);
   
-  // from Stalkerv21_DataLogger_5min example
-  // initialize the SD card
-  if (!card.init()) error("card.init");
-   
-  // initialize a FAT16 volume
-  if (!Fat16::init(&card)) error("Fat16::init");
-  
-  // clear write error
-  file.writeError = false;
-  
-  // O_CREAT - create the file if it does not exist
-  // O_APPEND - seek to the end of the file prior to each write
-  // O_WRITE - open for write
-  if (!file.open(name, O_CREAT | O_APPEND | O_WRITE))
-      error("error opening file");
-  
-  
-  // logging timestamp
-  // from 'now' example sketch
-  file.print(now.year(), DEC);
-  file.print('-');
-  file.print(now.month(), DEC);
-  file.print('-');
-  file.print(now.date(), DEC);
-  file.print(',');
-  file.print(now.hour(), DEC);
-  file.print(':');
-  file.print(now.minute(), DEC);
-  file.print(':');
-  file.print(now.second(), DEC);
-  file.print(',');
-  file.print(now.get(),DEC);
-  file.print(',');
-  
   // logging battery status
   file.print(voltage);
   file.print(',');
@@ -335,30 +349,11 @@ void loop()
   file.print(CS);
   file.print(',');
   
-  // logging SHT sensor info
-  file.print(tempSHT1);
-  file.print(",");
-  file.print(humSHT1);
-  file.print(",");
-  file.print(tempSHT2);
-  file.print(",");
-  file.print(humSHT2);
-  file.print(",");
-  file.print(tempSHT3);
-  file.print(",");
-  file.print(humSHT3);
-  file.print(",");
-
-  // logging gas sensor info
-  file.print(gasVal1);
-  file.print(",");
-
   //logging pressure info
   file.print(P,2); //absolute pressure
   file.print(",");
   file.print(p0,2); //sealevel pressure
-  file.println();
-         
+  
   if (!file.close()) 
       error("error closing file");
       
