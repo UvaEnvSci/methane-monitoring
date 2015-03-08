@@ -1,8 +1,8 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 3.0
-Date    : 2014-02-04
+Version : 4.0 - keeps active gas sensor heater on continuously, instead of using a pin to control it
+Date    : 2014-02-12
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
 Reports battery status.
@@ -14,7 +14,7 @@ Based on the following example sketches:
   'SFE_BMP180_Example',
   battery 'example' and 'tropo'.
 
-Last updated 2014.02.04
+Last updated 2014.02.12
 */
 
 //include libraries
@@ -58,7 +58,6 @@ float dewSHT3;
 // From 'tropo' sketch from book 'atmospheric modeling with Arduino'
 // define pins and variable for the gas sensor
 const int gasPin1 = A3; // analog pin that reads the gas sensor
-const int heaterPin1 = 8; // digital pin that controls the active heater
 int gasVal1 = 0; // value read from the sensor at #A3
 
 // create instance of BMP180 pressure sensor, set altitude:
@@ -128,9 +127,6 @@ void setup()
   DateTime  start = RTC.now();
   interruptTime = DateTime(start.get() + tcycle); //Adds SleepInt (in sec) to start time
 
-  // set digital pin 5 as output to the gas sensor's heater.
-  pinMode(heaterPin1, OUTPUT);
-
   // from SFE_BMP180_example
   // Initialize the pressure sensor
   if (pressure.begin())
@@ -145,7 +141,7 @@ void setup()
   {
     Serial.println("BMP180 init fail\n\n");
   }
-  
+ 
   // from Stalkerv21_DataLogger_5min example
   // initialize the SD card
   if (!card.init()) error("card.init");
@@ -171,9 +167,6 @@ void setup()
 
 void loop()
 {
-  digitalWrite(heaterPin1, HIGH);      // turn gas sensor heater on
-  Serial.println("Heater On");
-  Serial.println();
   delay(175000);
 
   // from Stalkerv21_DataLogger_5min example
@@ -283,8 +276,7 @@ void loop()
     file.print(gasVal1);
     file.print(",");
   }
-  digitalWrite(heaterPin1, LOW);       // shut off the heater  
-  	
+
   //from SFE_BMP180_example
   char status;
   double T,P,p0,a;
