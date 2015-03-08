@@ -1,8 +1,8 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 4.0 - keeps active gas sensor heater on continuously, instead of using a pin to control it
-Date    : 2014-02-12
+Version : 5.0 - Put all sensors on power controlled by digital pin.
+Date    : 2014-02-17
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
 Reports battery status.
@@ -14,7 +14,7 @@ Based on the following example sketches:
   'SFE_BMP180_Example',
   battery 'example' and 'tropo'.
 
-Last updated 2014.02.12
+Last updated 2014.02.17
 */
 
 //include libraries
@@ -38,6 +38,9 @@ int j = 0;               // counter
 
 // filename
 char name[] = "TESTMB80.CSV";
+
+// define digital pin for power supply
+const int PowerPin = 8;
 
 // define digital pins for SHT sensor
 const uint8_t dataPinSHT15  =  7;
@@ -106,6 +109,8 @@ void error_P(const char* str) {
 
 void setup()
 {
+  pinMode(PowerPin,OUTPUT); // set 'PowerPin' (#8) to output
+  
   analogReference(EXTERNAL); // use AREF for reference voltage (3.3)
 
   /*Initialize INT0 pin for accepting interrupts */
@@ -159,7 +164,7 @@ void setup()
       error("error opening file");
   
   // logging header
-  file.print("date,time,julian,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [mV],batt voltage [V],charge [%],status,pAbs [mb],pSea [mb]");
+  file.print("date,time,julian,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [dig],batt voltage [V],charge [%],status,pAbs [mb],pSea [mb]");
 
   if (!file.close()) 
       error("error closing file");
@@ -167,6 +172,7 @@ void setup()
 
 void loop()
 {
+  digitalWrite(PowerPin, HIGH); // turn power for sensors on
   delay(175000);
 
   // from Stalkerv21_DataLogger_5min example
@@ -348,7 +354,9 @@ void loop()
   
   if (!file.close()) 
       error("error closing file");
-      
+	  
+  digitalWrite(PowerPin, LOW); // shut off sensor power
+           
   //Everything below from StalkerV21_DataLogger_5min example
   RTC.clearINTStatus(); //This function call is  a must to bring /INT pin HIGH after an interrupt.
   RTC.enableInterrupts(interruptTime.hour(),interruptTime.minute(),interruptTime.second());    // set the interrupt at (h,m,s)
