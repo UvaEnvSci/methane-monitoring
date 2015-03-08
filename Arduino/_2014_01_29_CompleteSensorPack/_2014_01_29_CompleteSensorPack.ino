@@ -1,8 +1,8 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 5.0 - Put all sensors on power controlled by digital pin.
-Date    : 2014-02-17
+Version : 6.0
+Date    : 2014-02-18
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
 Reports battery status.
@@ -39,9 +39,6 @@ int j = 0;               // counter
 // filename
 char name[] = "TESTMB80.CSV";
 
-// define digital pin for power supply
-const int PowerPin = 8;
-
 // define digital pins for SHT sensor
 const uint8_t dataPinSHT15  =  7;
 const uint8_t clockPinSHT15 =  6;
@@ -60,6 +57,7 @@ float dewSHT3;
 
 // From 'tropo' sketch from book 'atmospheric modeling with Arduino'
 // define pins and variable for the gas sensor
+const int heaterPin1 = 8; // digital pin that controls the 5V step up power
 const int gasPin1 = A3; // analog pin that reads the gas sensor
 int gasVal1 = 0; // value read from the sensor at #A3
 
@@ -109,8 +107,6 @@ void error_P(const char* str) {
 
 void setup()
 {
-  pinMode(PowerPin,OUTPUT); // set 'PowerPin' (#8) to output
-  
   analogReference(EXTERNAL); // use AREF for reference voltage (3.3)
 
   /*Initialize INT0 pin for accepting interrupts */
@@ -172,7 +168,7 @@ void setup()
 
 void loop()
 {
-  digitalWrite(PowerPin, HIGH); // turn power for sensors on
+  digitalWrite(heaterPin1, HIGH); // turn 5V board on;
   delay(175000);
 
   // from Stalkerv21_DataLogger_5min example
@@ -283,6 +279,8 @@ void loop()
     file.print(",");
   }
 
+  digitalWrite(heaterPin1, LOW); //shut off 5V board to save power
+ 
   //from SFE_BMP180_example
   char status;
   double T,P,p0,a;
@@ -355,8 +353,6 @@ void loop()
   if (!file.close()) 
       error("error closing file");
 	  
-  digitalWrite(PowerPin, LOW); // shut off sensor power
-           
   //Everything below from StalkerV21_DataLogger_5min example
   RTC.clearINTStatus(); //This function call is  a must to bring /INT pin HIGH after an interrupt.
   RTC.enableInterrupts(interruptTime.hour(),interruptTime.minute(),interruptTime.second());    // set the interrupt at (h,m,s)
