@@ -1,8 +1,8 @@
 /*
 MethaneMonitoring sketch
 Author  : Michael van den Bossche
-Version : 1.0
-Date    : 2014-01-29
+Version : 2.0
+Date    : 2014-02-03
 
 Reads data from SHT15 rH&T sensor, TGS2600 gas sensor, and BMP180 pressure sensor.
 Reports battery status.
@@ -29,14 +29,14 @@ Last updated 2014.01.31
 #include <SFE_BMP180.h>  // for pressure sensor
 
 // define time constants, in millis
-// theat = 180000;       // time that the active heater is on (3min)
-// tSHT = 5000;          // time between SHT measurements (5 seconds)
-// tSHTMeas = 400;       // time it takes to do one SHT measurement (400ms)
-const int tcycle = 600;  // time for one meas cycle (in s, 10 minutes)
+// theat = 60000;        // time that the active heater is on (3min)
+// int tSHT = 5000;      // time between SHT measurements (5 seconds)
+// int tSHTMeas = 400;   // time it takes to do one SHT measurement (400ms)
+int tcycle = 600;        // time for one meas cycle (in s, 10 minutes). tcycle > theat + tmeas
 
 
 // filename
-char name[] = "TESTMB67.CSV";
+char name[] = "TESTMB77.CSV";
 
 // define digital pins for SHT sensor
 const uint8_t dataPinSHT15  =  7;
@@ -161,9 +161,11 @@ void setup()
       error("error opening file");
   
   // logging header
-  file.print("date,time,julian,batt voltage [V],charge [%],status,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [mV],pAbs [mb],pSea [mb]");
-  file.println();
-}
+  file.println("date,time,julian,batt voltage [V],charge [%],status,temp1 [C],rH1 [%],temp2 [C],rH2 [%],temp3 [C],rH3 [%],Vout CH4 [mV],pAbs [mb],pSea [mb]");
+
+    if (!file.close()) 
+      error("error closing file");
+  }
 
 void loop()
 {
@@ -182,7 +184,7 @@ void loop()
   Serial.println(" %");
   Serial.println();
   
-  delay((4200));
+  delay(4600);
   
   DateTime now = RTC.now(); //get the current date-time
   
@@ -221,7 +223,7 @@ void loop()
   Serial.println(gasVal1);
   Serial.println();
   
-  delay(4200);
+  delay(4600);
   
   //SHT sensor readout
   SHT15.measure(&tempSHT3, &humSHT3, &dewSHT3);
@@ -290,6 +292,23 @@ void loop()
   Serial.println(CS);
   Serial.println();
   delay(10);
+  
+  // from Stalkerv21_DataLogger_5min example
+  // initialize the SD card
+  if (!card.init()) error("card.init");
+   
+  // initialize a FAT16 volume
+  if (!Fat16::init(&card)) error("Fat16::init");
+  
+  // clear write error
+  file.writeError = false;
+  
+  // O_CREAT - create the file if it does not exist
+  // O_APPEND - seek to the end of the file prior to each write
+  // O_WRITE - open for write
+  if (!file.open(name, O_CREAT | O_APPEND | O_WRITE))
+      error("error opening file");
+  
   
   // logging timestamp
   // from 'now' example sketch
@@ -371,7 +390,6 @@ void loop()
   //\/\/\/\/\/\/\/\/\/\/\/\/Sleep Mode and Power Saver routines\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 } 
-  
 //Interrupt service routine for external interrupt on INT0 pin conntected to DS3231 /INT
 void INT0_ISR()
 {
@@ -379,4 +397,3 @@ void INT0_ISR()
    detachInterrupt(0); 
    interruptTime = DateTime(interruptTime.get() + tcycle);  //decide the time for next interrupt, configure next interrupt  
 }
-
